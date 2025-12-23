@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#87CEEB">
+    <title>TaskNote Student</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="manifest" href="#" id="manifest-placeholder">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 450px;
+            width: 100%;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .auth-card h2 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .app-header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .app-header h1 {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .user-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .task-container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .add-task-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            animation: slideUp 0.5s ease;
+        }
+        
+        .task-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            animation: slideUp 0.5s ease;
+        }
+        
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .task-item.completed {
+            opacity: 0.7;
+            background: #f8f9fa;
+        }
+        
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: #999;
+        }
+        
+        .task-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        
+        .task-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .task-deadline {
+            color: #764ba2;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            border: none;
+        }
+        
+        .btn-warning {
+            background: #f59e0b;
+            border: none;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            border: none;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+        
+        .empty-state img {
+            width: 200px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            z-index: 100;
+        }
+        
+        .bottom-nav-item {
+            text-align: center;
+            color: #999;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .bottom-nav-item:hover,
+        .bottom-nav-item.active {
+            color: #667eea;
+        }
+        
+        .bottom-nav-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .bottom-nav-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-count {
+            background: #ef4444;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .modal-content {
+            border-radius: 15px;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        @media (max-width: 576px) {
+            .auth-card {
+                padding: 30px 20px;
+            }
+            
+            .task-item {
+                padding: 15px;
+            }
+            
+            .task-actions {
+                flex-wrap: wrap;
+            }
+        }
+        
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+        }
+        
+        .splash-logo {
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .splash-text {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+        
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-logo">📝</div>
+        <div class="splash-text">TaskNote Student</div>
+    </div>
+
+    <!-- Auth Section -->
+    <div id="authSection" style="display: none;">
+        <!-- Login Form -->
+        <div id="loginForm" class="auth-container">
+            <div class="auth-card">
+                <h2>🎓 TaskNote Student</h2>
+                <p class="text-center text-muted mb-4">Masuk ke akun Anda</p>
+                <form id="loginFormElement">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="loginEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="loginPassword" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">Ingat Saya</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Masuk</button>
+                    <p class="text-center mb-0">
+                        Belum punya akun? <a href="#" id="showRegister" style="color: #667eea; font-weight: 600;">Daftar</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" class="auth-container" style="display: none;">
+            <div class="auth-card">
+                <h2>📚 Daftar Akun Baru</h2>
+                <p class="text-center text-muted mb-4">Buat akun untuk memulai</p>
+                <form id="registerFormElement">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" class="form-control" id="registerName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="registerEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password (Min. 6 karakter)</label>
+                        <input type="password" class="form-control" id="registerPassword" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Daftar</button>
+                    <p class="text-center mb-0">
+                        Sudah punya akun? <a href="#" id="showLogin" style="color: #667eea; font-weight: 600;">Masuk</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Section -->
+    <div id="appSection" style="display: none;">
+        <!-- Header -->
+        <div class="app-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>📝 TaskNote</h1>
+                    <div class="user-info">Halo, <span id="userName"></span>!</div>
+                </div>
+                <button class="btn btn-outline-danger btn-sm" id="logoutBtn">Keluar</button>
+            </div>
+        </div>
+
+        <!-- Task Container -->
+        <div class="task-container">
+            <!-- Add Task Form -->
+            <div class="add-task-card">
+                <h5 class="mb-3" style="color: #667eea; font-weight: 600;">➕ Tambah Tugas Baru</h5>
+                <form id="addTaskForm">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="taskTitle" placeholder="Judul Tugas" required>
+                    </div>
+                    <div class="mb-3">
+                        <textarea class="form-control" id="taskDescription" rows="3" placeholder="Deskripsi / Catatan"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Deadline</label>
+                        <input type="date" class="form-control" id="taskDeadline" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Tambah Tugas</button>
+                </form>
+            </div>
+
+            <!-- Tasks List -->
+            <div id="tasksList">
+                <!-- Tasks will be rendered here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div style="font-size: 80px; margin-bottom: 20px;">📚</div>
+                <h3>Belum Ada Tugas</h3>
+                <p>Tambahkan tugas pertama Anda untuk memulai!</p>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="container">
+                <div class="row">
+                    <div class="col-4">
+                        <a href="#" class="bottom-nav-item active d-block" id="navAll">
+                            <div class="bottom-nav-icon">📋</div>
+                            <div class="bottom-nav-text">Semua</div>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="#" class="bottom-nav-item d-block" id="navActive">
+                            <div class="bottom-nav-icon">⏳</div>
+                            <div class="bottom-nav-text">Aktif</div>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="#" class="bottom-nav-item d-block" id="navCompleted">
+                            <div class="bottom-nav-icon">✅</div>
+                            <div class="bottom-nav-text">Selesai</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Tugas</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTaskForm">
+                        <input type="hidden" id="editTaskId">
+                        <div class="mb-3">
+                            <label class="form-label">Judul Tugas</label>
+                            <input type="text" class="form-control" id="editTaskTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Deskripsi</label>
+                            <textarea class="form-control" id="editTaskDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Deadline</label>
+                            <input type="date" class="form-control" id="editTaskDeadline" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Simpan Perubahan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Generate manifest.json dynamically
+        const manifestJson = {
+            name: 'TaskNote Student',
+            short_name: 'TaskNote',
+            description: 'Aplikasi manajemen tugas untuk mahasiswa',
+            start_url: '.',
+            display: 'standalone',
+            background_color: '#667eea',
+            theme_color: '#667eea',
+            icons: [
+                {
+                    src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23667eea" width="100" height="100" rx="20"/><text x="50" y="70" font-size="60" text-anchor="middle" fill="white">📝</text></svg>',
+                    sizes: '512x512',
+                    type: 'image/svg+xml'
+                }
+            ]
+        };
+        
+        const manifestBlob = new Blob([JSON.stringify(manifestJson)], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'tasknote-v1';
+                const urlsToCache = ['/'];
+                
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.addAll(urlsToCache))
+                    );
+                });
+                
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => response || fetch(event.request))
+                    );
+                });
+            `;
+            
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swURL = URL.createObjectURL(blob);
+            
+            navigator.serviceWorker.register(swURL)
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed'));
+        }
+
+        // Splash Screen
+        setTimeout(() => {
+            document.getElementById('splashScreen').classList.add('fade-out');
+            setTimeout(() => {
+                document.getElementById('splashScreen').style.display = 'none';
+                checkAuth();
+            }, 500);
+        }, 2000);
+
+        // Simple encryption/decryption
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString(36);
+        }
+
+        // Auth Functions
+        function checkAuth() {
+            const session = localStorage.getItem('taskNoteSession');
+            if (session) {
+                const user = JSON.parse(session);
+                showApp(user);
+            } else {
+                showAuth();
+            }
+        }
+
+        function showAuth() {
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('appSection').style.display = 'none';
+        }
+
+        function showApp(user) {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('appSection').style.display = 'block';
+            document.getElementById('userName').textContent = user.name;
+            loadTasks();
+        }
+
+        // Register
+        document.getElementById('registerFormElement').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (password.length < 6) {
+                alert('Password minimal 6 karakter!');
+                return;
+            }
+            
+            let users = JSON.parse(localStorage.getItem('taskNoteUsers') || '[]');
+            
+            if (users.find(u => u.email === email)) {
+                alert('Email sudah terdaftar!');
+                return;
+            }
+            
+            const user = {
+                id: Date.now(),
+                name,
+                email,
+                password: simpleHash(password)
+            };
+            
+            users.push(user);
+            localStorage.setItem('taskNoteUsers', JSON.stringify(users));
+            
+            alert('Registrasi berhasil! Silakan login.');
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('registerFormElement').reset();
+        });
+
+        // Login
+        document.getElementById('loginFormElement').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const remember = document.getElementById('rememberMe').checked;
+            
+            const users = JSON.parse(localStorage.getItem('taskNoteUsers') || '[]');
+            const user = users.find(u => u.email === email && u.password === simpleHash(password));
+            
+            if (user) {
+                const session = {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email
+                };
+                
+                localStorage.setItem('taskNoteSession', JSON.stringify(session));
+                
+                if (remember) {
+                    localStorage.setItem('taskNoteRemember', 'true');
+                }
+                
+                showApp(session);
+                document.getElementById('loginFormElement').reset();
+            } else {
+                alert('Email atau password salah!');
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (confirm('Yakin ingin keluar?')) {
+                localStorage.removeItem('taskNoteSession');
+                showAuth();
+            }
+        });
+
+        // Toggle forms
+        document.getElementById('showRegister').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        });
+
+        document.getElementById('showLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        });
+
+        // Task Management
+        let currentFilter = 'all';
+
+        function getTasks() {
+            const session = JSON.parse(localStorage.getItem('taskNoteSession'));
+            const allTasks = JSON.parse(localStorage.getItem('taskNoteTasks') || '[]');
+            return allTasks.filter(task => task.userId === session.id);
+        }
+
+        function saveTasks(tasks) {
+            const allTasks = JSON.parse(localStorage.getItem('taskNoteTasks') || '[]');
+            const session = JSON.parse(localStorage.getItem('taskNoteSession'));
+            
+            // Remove old tasks for this user
+            const otherTasks = allTasks.filter(task => task.userId !== session.id);
+            
+            // Add new tasks
+            const updatedTasks = [...otherTasks, ...tasks];
+            localStorage.setItem('taskNoteTasks', JSON.stringify(updatedTasks));
+        }
+
+        function loadTasks() {
+            const tasks = getTasks();
+            const tasksList = document.getElementById('tasksList');
+            const emptyState = document.getElementById('emptyState');
+            
+            let filteredTasks = tasks;
+            if (currentFilter === 'active') {
+                filteredTasks = tasks.filter(t => !t.completed);
+            } else if (currentFilter === 'completed') {
+                filteredTasks = tasks.filter(t => t.completed);
+            }
+            
+            if (filteredTasks.length === 0) {
+                tasksList.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            tasksList.innerHTML = filteredTasks.map(task => `
+                <div class="task-item ${task.completed ? 'completed' : ''}">
+                    <div class="task-title">${task.title}</div>
+                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                    <div class="task-deadline">📅 ${new Date(task.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm ${task.completed ? 'btn-warning' : 'btn-success'}" onclick="toggleTask(${task.id})">
+                            ${task.completed ? '↩️ Aktifkan' : '✓ Selesai'}
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="editTask(${task.id})">✏️ Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteTask(${task.id})">🗑️ Hapus</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Add Task
+        document.getElementById('addTaskForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const session = JSON.parse(localStorage.getItem('taskNoteSession'));
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const deadline = document.getElementById('taskDeadline').value;
+            
+            const tasks = getTasks();
+            const newTask = {
+                id: Date.now(),
+                userId: session.id,
+                title,
+                description,
+                deadline,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+            
+            tasks.push(newTask);
+            saveTasks(tasks);
+            
+            document.getElementById('addTaskForm').reset();
+            loadTasks();
+        });
+
+        // Toggle Task
+        function toggleTask(id) {
+            const tasks = getTasks();
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks(tasks);
+                loadTasks();
+            }
+        }
+
+        // Edit Task
+        function editTask(id) {
+            const tasks = getTasks();
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                document.getElementById('editTaskId').value = task.id;
+                document.getElementById('editTaskTitle').value = task.title;
+                document.getElementById('editTaskDescription').value = task.description;
+                document.getElementById('editTaskDeadline').value = task.deadline;
+                
+                const modal = new bootstrap.Modal(document.getElementById('editModal'));
+                modal.show();
+            }
+        }
+
+        document.getElementById('editTaskForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const id = parseInt(document.getElementById('editTaskId').value);
+            const tasks = getTasks();
+            const task = tasks.find(t => t.id === id);
+            
+            if (task) {
+                task.title = document.getElementById('editTaskTitle').value;
+                task.description = document.getElementById('editTaskDescription').value;
+                task.deadline = document.getElementById('editTaskDeadline').value;
+                
+                saveTasks(tasks);
+                loadTasks();
+                
+                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+            }
+        });
+
+        // Delete Task
+        function deleteTask(id) {
+            if (confirm('Yakin ingin menghapus tugas ini?')) {
+                const tasks = getTasks();
+                const filteredTasks = tasks.filter(t => t.id !== id);
+                saveTasks(filteredTasks);
+                loadTasks();
+            }
+        }
+
+        // Navigation
+        document.getElementById('navAll').addEventListener('click', (e) => {
+            e.preventDefault();
+            currentFilter = 'all';
+            updateNav('navAll');
+            loadTasks();
+        });
+
+        document.getElementById('navActive').addEventListener('click', (e) => {
+            e.preventDefault();
+            currentFilter = 'active';
+            updateNav('navActive');
+            loadTasks();
+        });
+
+        document.getElementById('navCompleted').addEventListener('click', (e) => {
+            e.preventDefault();
+            currentFilter = 'completed';
+            updateNav('navCompleted');
+            loadTasks();
+        });
+
+        function updateNav(activeId) {
+            document.querySelectorAll('.bottom-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.getElementById(activeId).classList.add('active');
+        }
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('taskDeadline').setAttribute('min', today);
+    </script>
+</body>
+</html>
